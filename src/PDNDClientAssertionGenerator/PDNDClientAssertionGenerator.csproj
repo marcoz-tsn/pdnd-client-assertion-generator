@@ -11,7 +11,7 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>.NET Client Assertion Generator for PDND Service API</Title>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-	<Version>1.0.1</Version>
+	<Version>1.0.2</Version>
     <AssemblyVersion></AssemblyVersion>
   </PropertyGroup>
 
