@@ -13,17 +13,27 @@ using System.Text.Json;
 
 namespace PDNDClientAssertionGenerator.Services
 {
+    /// <summary>
+    /// Service for handling OAuth2 client assertion generation and token requests.
+    /// </summary>
     public class OAuth2Service : IOAuth2Service
     {
         private readonly ClientAssertionConfig _config;
 
-        // Constructor for OAuth2Service, takes a configuration object.
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OAuth2Service"/> class.
+        /// </summary>
+        /// <param name="config">An <see cref="IOptions{ClientAssertionConfig}"/> object containing the configuration for client assertion generation.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="config"/> is null.</exception>
         public OAuth2Service(IOptions<ClientAssertionConfig> config)
         {
             _config = config.Value ?? throw new ArgumentNullException(nameof(config));
         }
 
-        // Asynchronously generates a client assertion JWT token.
+        /// <summary>
+        /// Asynchronously generates a client assertion (JWT) token.
+        /// </summary>
+        /// <returns>A task that represents the asynchronous operation, containing the generated client assertion as a string.</returns>
         public async Task<string> GenerateClientAssertionAsync()
         {
             // Generate a unique token ID (JWT ID)
@@ -83,7 +93,11 @@ namespace PDNDClientAssertionGenerator.Services
             return await Task.FromResult(clientAssertion); // Return the generated token as a string.
         }
 
-        // Asynchronously requests an access token by sending the client assertion to the OAuth2 server.
+        /// <summary>
+        /// Asynchronously requests an access token by sending the client assertion to the OAuth2 server.
+        /// </summary>
+        /// <param name="clientAssertion">The client assertion (JWT) used for the token request.</param>
+        /// <returns>A task that represents the asynchronous operation, containing the response with the access token as a <see cref="PDNDTokenResponse"/>.</returns>
         public async Task<PDNDTokenResponse> RequestAccessTokenAsync(string clientAssertion)
         {
             using var httpClient = new HttpClient();
