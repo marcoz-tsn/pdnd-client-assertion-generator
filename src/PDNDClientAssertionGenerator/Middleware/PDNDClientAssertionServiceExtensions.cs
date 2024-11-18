@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿// (c) 2024 Francesco Del Re <francesco.delre.87@gmail.com>
+// This code is licensed under MIT license (see LICENSE.txt for details)
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PDNDClientAssertionGenerator.Configuration;
 using PDNDClientAssertionGenerator.Interfaces;
@@ -16,9 +18,11 @@ namespace PDNDClientAssertionGenerator.Middleware
         /// <returns>The updated IServiceCollection instance.</returns>
         public static IServiceCollection AddPDNDClientAssertionServices(this IServiceCollection services)
         {
-            // Use ConfigurationManager to load the configuration file (appsettings.json)
+            // Use ConfigurationManager to load the configuration file (appsettings.json or environment variables)
             var configuration = new ConfigurationManager()
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true) // Load configuration
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddEnvironmentVariables()
                 .Build();
 
             // Ensure that the configuration contains required sections and values

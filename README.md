@@ -36,7 +36,7 @@ To properly set up and use the Client Assertion Generator in your ASP.NET Core a
 1. Configure Client Assertion Settings, an example below:
   ```xml
   "ClientAssertionConfig": {
-    "ServerUrl": "",
+    "ServerUrl": "https://test-server-url.com",
     "KeyId": "ZmYxZGE2YjQtMzY2Yy00NWI5LThjNGItMDJmYmQyZGIyMmZh",
     "Algorithm": "RS256",
     "Type": "at+jwt",
@@ -45,7 +45,7 @@ To properly set up and use the Client Assertion Generator in your ASP.NET Core a
     "Subject": "9b361d49-33f4-4f1e-a88b-4e12661f2309",
     "Audience": "https://erogatore.example/ente-example/v1",
     "PurposeId": "1b361d49-33f4-4f1e-a88b-4e12661f2300",
-    "KeyPath": "/path/",
+    "KeyPath": "C:/Keys/private.pem",
     "Duration": "600"
   },
   ```

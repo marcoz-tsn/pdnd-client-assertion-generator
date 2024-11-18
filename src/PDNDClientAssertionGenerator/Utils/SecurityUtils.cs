@@ -21,11 +21,20 @@ namespace PDNDClientAssertionGenerator.Utils
                 throw new ArgumentException("Key path cannot be null or empty.", nameof(keyPath));
             }
 
+            // Normalize the key path by removing any trailing directory or alternative directory separators
+            string normalizedPath = keyPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+            // Check if the key file exists at the specified path
+            if (!File.Exists(normalizedPath))
+            {
+                throw new FileNotFoundException($"The specified key file does not exist at the path: {keyPath}");
+            }
+
             // Read the PEM content from the specified file
             string pemContent;
             try
             {
-                pemContent = File.ReadAllText(keyPath).Trim();
+                pemContent = File.ReadAllText(normalizedPath).Trim();
             }
             catch (Exception ex)
             {
