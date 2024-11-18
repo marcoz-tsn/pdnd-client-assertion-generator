@@ -28,9 +28,15 @@ jobs:
     - name: Build PDNDClientAssertionGenerator
       run: dotnet build src/PDNDClientAssertionGenerator/PDNDClientAssertionGenerator.csproj --no-restore --configuration Release
 
+    - name: Ensure output directory exists
+      run: mkdir -p ./output
+
     - name: Pack the NuGet package
       run: dotnet pack src/PDNDClientAssertionGenerator/PDNDClientAssertionGenerator.csproj --configuration Release --no-build --output ./output
 
+    - name: Debug output directory
+      run: ls -la ./output
+      
     - name: Publish to NuGet
       env:
         NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
