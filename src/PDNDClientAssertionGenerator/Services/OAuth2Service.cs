@@ -2,12 +2,14 @@
 // This code is licensed under MIT license (see LICENSE.txt for details)
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using PDNDClientAssertionGenerator.Configuration;
 using PDNDClientAssertionGenerator.Interfaces;
 using PDNDClientAssertionGenerator.Models;
 using PDNDClientAssertionGenerator.Utils;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
+using System.Net.Mime;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -46,9 +48,9 @@ namespace PDNDClientAssertionGenerator.Services
             // Define JWT header as a dictionary of key-value pairs.
             Dictionary<string, string> headers = new()
             {
-                { "kid", _config.KeyId },    // Key ID used to identify the signing key
-                { "alg", _config.Algorithm }, // Algorithm used for signing (e.g., RS256)
-                { "typ", _config.Type }       // Type of the token, usually "JWT"
+                { JwtHeaderParameterNames.Kid, _config.KeyId },    // Key ID used to identify the signing key
+                { JwtHeaderParameterNames.Alg, _config.Algorithm }, // Algorithm used for signing (e.g., RS256)
+                { JwtHeaderParameterNames.Typ, _config.Type }       // Type of the token, usually "JWT"
             };
 
             // Define the payload as a list of claims, which represent the content of the JWT.
@@ -105,14 +107,14 @@ namespace PDNDClientAssertionGenerator.Services
             // Create the payload for the POST request in URL-encoded format.
             var payload = new Dictionary<string, string>
             {
-                { "client_id", _config.ClientId }, // Client ID as per OAuth2 spec
-                { "client_assertion", clientAssertion }, // Client assertion (JWT) generated in the previous step
-                { "client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer" }, // Assertion type
-                { "grant_type", "client_credentials" } // Grant type for client credentials
+                { OpenIdConnectParameterNames.ClientId, _config.ClientId }, // Client ID as per OAuth2 spec
+                { OpenIdConnectParameterNames.ClientAssertion, clientAssertion }, // Client assertion (JWT) generated in the previous step
+                { OpenIdConnectParameterNames.ClientAssertionType, "urn:ietf:params:oauth:client-assertion-type:jwt-bearer" }, // Assertion type
+                { OpenIdConnectParameterNames.GrantType, OpenIdConnectGrantTypes.ClientCredentials } // Grant type for client credentials
             };
 
             // Set the Accept header to request JSON responses from the server.
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaTypeNames.Application.Json));
 
             // Create the content for the POST request (FormUrlEncodedContent).
             var content = new FormUrlEncodedContent(payload);
