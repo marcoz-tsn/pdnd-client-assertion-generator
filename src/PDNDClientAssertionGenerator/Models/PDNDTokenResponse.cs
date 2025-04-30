@@ -2,6 +2,7 @@
 // This code is licensed under MIT license (see LICENSE.txt for details)
 using System.Text.Json.Serialization;
 
+// ReSharper disable InconsistentNaming
 namespace PDNDClientAssertionGenerator.Models
 {
     public class PDNDTokenResponse

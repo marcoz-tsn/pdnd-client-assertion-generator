@@ -39,11 +39,11 @@ namespace PDNDClientAssertionGenerator.Services
         public async Task<string> GenerateClientAssertionAsync()
         {
             // Generate a unique token ID (JWT ID)
-            Guid tokenId = Guid.NewGuid();
+            var tokenId = Guid.NewGuid();
 
             // Define the current UTC time and the token expiration time.
-            DateTime issuedAt = DateTime.UtcNow;
-            DateTime expiresAt = issuedAt.AddMinutes(_config.Duration);
+            var issuedAt = DateTime.UtcNow;
+            var expiresAt = issuedAt.AddMinutes(_config.Duration);
 
             // Define JWT header as a dictionary of key-value pairs.
             Dictionary<string, string> headers = new()
@@ -59,7 +59,7 @@ namespace PDNDClientAssertionGenerator.Services
                 new Claim(JwtRegisteredClaimNames.Iss, _config.Issuer),   // Issuer of the token
                 new Claim(JwtRegisteredClaimNames.Sub, _config.Subject),  // Subject of the token
                 new Claim(JwtRegisteredClaimNames.Aud, _config.Audience), // Audience for which the token is intended
-                new Claim("purposeId", _config.PurposeId),                // Custom claim for the purpose of the token
+                new Claim(OAuth2Consts.PDNDPurposeIdClaimName, _config.PurposeId), // Custom claim for the purpose of the token
                 new Claim(JwtRegisteredClaimNames.Jti, tokenId.ToString("D").ToLower()), // JWT ID
                 new Claim(JwtRegisteredClaimNames.Iat, issuedAt.ToUnixTimestamp().ToString(), ClaimValueTypes.Integer64), // Issued At time (as Unix timestamp)
                 new Claim(JwtRegisteredClaimNames.Exp, expiresAt.ToUnixTimestamp().ToString(), ClaimValueTypes.Integer64)  // Expiration time (as Unix timestamp)
@@ -81,7 +81,7 @@ namespace PDNDClientAssertionGenerator.Services
 
             // Use JwtSecurityTokenHandler to convert the token into a string.
             var tokenHandler = new JwtSecurityTokenHandler();
-            string clientAssertion = string.Empty;
+            string clientAssertion;
 
             try
             {
@@ -120,18 +120,22 @@ namespace PDNDClientAssertionGenerator.Services
             var content = new FormUrlEncodedContent(payload);
 
             // Send the POST request to the OAuth2 server and await the response.
-            HttpResponseMessage response = await httpClient.PostAsync(_config.ServerUrl, content);
+            var response = await httpClient.PostAsync(_config.ServerUrl, content);
 
             // Ensure the response indicates success (throws an exception if not).
             response.EnsureSuccessStatusCode();
 
             // Read and parse the response body as a JSON string.
-            string jsonResponse = await response.Content.ReadAsStringAsync();
+            var jsonResponse = await response.Content.ReadAsStringAsync();
 
             try
             {
                 // Deserialize the JSON response into the PDNDTokenResponse object.
-                return JsonSerializer.Deserialize<PDNDTokenResponse>(jsonResponse);
+                return JsonSerializer.Deserialize<PDNDTokenResponse>(jsonResponse) ?? new PDNDTokenResponse
+                {
+                  TokenType = string.Empty
+                  , AccessToken = string.Empty
+                };
             }
             catch (JsonException ex)
             {

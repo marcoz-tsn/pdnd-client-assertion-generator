@@ -1,6 +1,7 @@
 ﻿// (c) 2024 Francesco Del Re <francesco.delre.87@gmail.com>
 // This code is licensed under MIT license (see LICENSE.txt for details)
 
+// ReSharper disable CommentTypo
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 namespace PDNDClientAssertionGenerator.Configuration
 {
@@ -59,6 +60,7 @@ namespace PDNDClientAssertionGenerator.Configuration
         /// <summary>
         /// Gets or sets the purpose for which access to resources will be requested (purposeId)
         /// <remarks>PDND: Fruizione / I tuoi client e-service / Gestisci client e-service / Client Assertion / ID DELLA FINALITÀ</remarks>
+        /// <remarks>IW: Connector.PurposeExtid</remarks>
         /// </summary>
         public string PurposeId { get; set; }
 
