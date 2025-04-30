@@ -48,9 +48,9 @@ namespace PDNDClientAssertionGenerator.Services
             // Define JWT header as a dictionary of key-value pairs.
             Dictionary<string, string> headers = new()
             {
-                { JwtHeaderParameterNames.Kid, _config.KeyId },    // Key ID used to identify the signing key
+                //{ JwtHeaderParameterNames.Kid, _config.KeyId },    // Key ID used to identify the signing key
                 { JwtHeaderParameterNames.Alg, _config.Algorithm }, // Algorithm used for signing (e.g., RS256)
-                { JwtHeaderParameterNames.Typ, _config.Type }       // Type of the token, usually "JWT"
+                //{ JwtHeaderParameterNames.Typ, _config.Type }       // Type of the token, usually "JWT"
             };
 
             // Define the payload as a list of claims, which represent the content of the JWT.
@@ -67,7 +67,10 @@ namespace PDNDClientAssertionGenerator.Services
 
             // Create signing credentials using RSA for signing the token.
             using var rsa = SecurityUtils.GetRsaFromKeyPath(_config.KeyPath);
-            var rsaSecurityKey = new RsaSecurityKey(rsa);
+            var rsaSecurityKey = new RsaSecurityKey(rsa)
+            {
+              KeyId = _config.KeyId
+            };
             var signingCredentials = new SigningCredentials(rsaSecurityKey, SecurityAlgorithms.RsaSha256)
             {
                 CryptoProviderFactory = new CryptoProviderFactory { CacheSignatureProviders = false }
@@ -75,7 +78,7 @@ namespace PDNDClientAssertionGenerator.Services
 
             // Create the JWT token with the specified header and payload claims.
             var token = new JwtSecurityToken(
-                new JwtHeader(signingCredentials, headers),
+                new JwtHeader(signingCredentials, headers, _config.Type),
                 new JwtPayload(payloadClaims)
             );
 

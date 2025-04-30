@@ -6,7 +6,7 @@ namespace PDNDClientAssertionGenerator.Interfaces
 {
     public interface IOAuth2Service
     {
-        Task<string> GenerateClientAssertionAsync();
+        Task<string> GenerateClientAssertionAsync(string? tokenId = null);
         Task<PDNDTokenResponse> RequestAccessTokenAsync(string clientAssertion);
     }
 }
