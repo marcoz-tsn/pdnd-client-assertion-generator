@@ -36,10 +36,10 @@ namespace PDNDClientAssertionGenerator.Services
         /// Asynchronously generates a client assertion (JWT) token.
         /// </summary>
         /// <returns>A task that represents the asynchronous operation, containing the generated client assertion as a string.</returns>
-        public async Task<string> GenerateClientAssertionAsync()
+        public async Task<string> GenerateClientAssertionAsync(string? tokenId = null)
         {
             // Generate a unique token ID (JWT ID)
-            var tokenId = Guid.NewGuid();
+            tokenId ??= Guid.NewGuid().ToString("D").ToLower();
 
             // Define the current UTC time and the token expiration time.
             var issuedAt = DateTime.UtcNow;
@@ -60,7 +60,7 @@ namespace PDNDClientAssertionGenerator.Services
                 new Claim(JwtRegisteredClaimNames.Sub, _config.Subject),  // Subject of the token
                 new Claim(JwtRegisteredClaimNames.Aud, _config.Audience), // Audience for which the token is intended
                 new Claim(OAuth2Consts.PDNDPurposeIdClaimName, _config.PurposeId), // Custom claim for the purpose of the token
-                new Claim(JwtRegisteredClaimNames.Jti, tokenId.ToString("D").ToLower()), // JWT ID
+                new Claim(JwtRegisteredClaimNames.Jti, tokenId), // JWT ID
                 new Claim(JwtRegisteredClaimNames.Iat, issuedAt.ToUnixTimestamp().ToString(), ClaimValueTypes.Integer64), // Issued At time (as Unix timestamp)
                 new Claim(JwtRegisteredClaimNames.Exp, expiresAt.ToUnixTimestamp().ToString(), ClaimValueTypes.Integer64)  // Expiration time (as Unix timestamp)
             };
@@ -109,7 +109,7 @@ namespace PDNDClientAssertionGenerator.Services
             {
                 { OpenIdConnectParameterNames.ClientId, _config.ClientId }, // Client ID as per OAuth2 spec
                 { OpenIdConnectParameterNames.ClientAssertion, clientAssertion }, // Client assertion (JWT) generated in the previous step
-                { OpenIdConnectParameterNames.ClientAssertionType, "urn:ietf:params:oauth:client-assertion-type:jwt-bearer" }, // Assertion type
+                { OpenIdConnectParameterNames.ClientAssertionType, OAuth2Consts.ClientAssertionTypeJwtBearer }, // Assertion type
                 { OpenIdConnectParameterNames.GrantType, OpenIdConnectGrantTypes.ClientCredentials } // Grant type for client credentials
             };
 
