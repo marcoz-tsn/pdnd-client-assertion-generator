@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>$(MSBuildProjectName.Replace(" ", "_").Replace(".Abstractions", ""))</RootNamespace>
+  </PropertyGroup>
+  <!--<PropertyGroup>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild> --><!--Enable prior to release a new version--><!--
+    <RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
+  </PropertyGroup>
+  <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="BuildOnlySettings;ResolveReferences">
+    <ItemGroup>
+      <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))" />
+    </ItemGroup>
+  </Target>
+  <Target Name="PostPackNugetDeploy" AfterTargets="Pack">
+    <Exec Command="%userprofile%\.nuget\nuget.exe delete $(PackageId) $(PackageVersion) -source &quot;E:\Dati\Svil\NuGetRepo&quot; -noninteractive" ContinueOnError="true" />
+    <Exec Command="rmdir /s /q %userprofile%\.nuget\packages\$(PackageId)\$(PackageVersion)" ContinueOnError="true" />
+    <Exec Command="%userprofile%\.nuget\nuget.exe add &quot;bin\$(ConfigurationName)\$(PackageId).$(PackageVersion).nupkg&quot; -source &quot;E:\Dati\Svil\NuGetRepo&quot;" />
+  </Target>-->
+
+</Project>

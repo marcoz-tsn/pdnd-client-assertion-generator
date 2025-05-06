@@ -1,11 +1,12 @@
 ﻿// (c) 2024 Francesco Del Re <francesco.delre.87@gmail.com>
 // This code is licensed under MIT license (see LICENSE.txt for details)
 using System.Text.Json.Serialization;
+using Italia.Pdnd.Identity.Client.OAuth2;
 
 // ReSharper disable InconsistentNaming
 namespace PDNDClientAssertionGenerator.Models
 {
-    public class PDNDTokenResponse
+    public class PDNDTokenResponse : IPdndTokenResponse
     {
         [JsonPropertyName("token_type")]
         public required string TokenType { get; set; }

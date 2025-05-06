@@ -41,4 +41,8 @@
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Italia.Pdnd.Identity.Abstractions\Italia.Pdnd.Identity.Abstractions.csproj" />
+  </ItemGroup>
+
 </Project>
