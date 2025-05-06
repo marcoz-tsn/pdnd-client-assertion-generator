@@ -36,40 +36,56 @@ namespace PDNDClientAssertionGenerator.Services
         /// Asynchronously generates a client assertion (JWT) token.
         /// </summary>
         /// <returns>A task that represents the asynchronous operation, containing the generated client assertion as a string.</returns>
-        public async Task<string> GenerateClientAssertionAsync(string? tokenId = null)
+        public async Task<string> GenerateClientAssertionAsync()
         {
-            // Generate a unique token ID (JWT ID)
-            tokenId ??= Guid.NewGuid().ToString("D").ToLower();
+          // Generate a unique token ID (JWT ID)
+          return await GenerateClientAssertionAsync(Guid.NewGuid().ToString("D").ToLower());
+        }
 
+        /// <summary>
+        /// Asynchronously generates a client assertion (JWT) token.
+        /// </summary>
+        /// <returns>A task that represents the asynchronous operation, containing the generated client assertion as a string.</returns>
+        public async Task<string> GenerateClientAssertionAsync(string tokenId)
+        {
+          return await GenerateClientAssertionAsync(tokenId, _config);
+        }
+
+        /// <summary>
+        /// Asynchronously generates a client assertion (JWT) token.
+        /// </summary>
+        /// <returns>A task that represents the asynchronous operation, containing the generated client assertion as a string.</returns>
+        public async Task<string> GenerateClientAssertionAsync(string tokenId, ClientAssertionConfig config)
+        {
             // Define the current UTC time and the token expiration time.
             var issuedAt = DateTime.UtcNow;
-            var expiresAt = issuedAt.AddMinutes(_config.Duration);
+            var expiresAt = issuedAt.AddMinutes(config.Duration);
 
             // Define JWT header as a dictionary of key-value pairs.
             Dictionary<string, string> headers = new()
             {
-                //{ JwtHeaderParameterNames.Kid, _config.KeyId },    // Key ID used to identify the signing key
-                { JwtHeaderParameterNames.Alg, _config.Algorithm }, // Algorithm used for signing (e.g., RS256)
-                //{ JwtHeaderParameterNames.Typ, _config.Type }       // Type of the token, usually "JWT"
+                //{ JwtHeaderParameterNames.Kid, config.KeyId },   // Key ID used to identify the signing key
+                { JwtHeaderParameterNames.Alg, config.Algorithm }, // Algorithm used for signing (e.g., RS256)
+                //{ JwtHeaderParameterNames.Typ, config.Type }     // Type of the token, usually "JWT"
             };
 
             // Define the payload as a list of claims, which represent the content of the JWT.
             var payloadClaims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Iss, _config.Issuer),   // Issuer of the token
-                new Claim(JwtRegisteredClaimNames.Sub, _config.Subject),  // Subject of the token
-                new Claim(JwtRegisteredClaimNames.Aud, _config.Audience), // Audience for which the token is intended
-                new Claim(OAuth2Consts.PDNDPurposeIdClaimName, _config.PurposeId), // Custom claim for the purpose of the token
+                new Claim(JwtRegisteredClaimNames.Iss, config.Issuer),   // Issuer of the token
+                new Claim(JwtRegisteredClaimNames.Sub, config.Subject),  // Subject of the token
+                new Claim(JwtRegisteredClaimNames.Aud, config.Audience), // Audience for which the token is intended
+                new Claim(OAuth2Consts.PDNDPurposeIdClaimName, config.PurposeId), // Custom claim for the purpose of the token
                 new Claim(JwtRegisteredClaimNames.Jti, tokenId), // JWT ID
                 new Claim(JwtRegisteredClaimNames.Iat, issuedAt.ToUnixTimestamp().ToString(), ClaimValueTypes.Integer64), // Issued At time (as Unix timestamp)
                 new Claim(JwtRegisteredClaimNames.Exp, expiresAt.ToUnixTimestamp().ToString(), ClaimValueTypes.Integer64)  // Expiration time (as Unix timestamp)
             };
 
             // Create signing credentials using RSA for signing the token.
-            using var rsa = SecurityUtils.GetRsaFromKeyPath(_config.KeyPath);
+            using var rsa = SecurityUtils.GetRsaFromKeyPath(config.KeyPath);
             var rsaSecurityKey = new RsaSecurityKey(rsa)
             {
-              KeyId = _config.KeyId
+              KeyId = config.KeyId
             };
             var signingCredentials = new SigningCredentials(rsaSecurityKey, SecurityAlgorithms.RsaSha256)
             {
@@ -78,7 +94,7 @@ namespace PDNDClientAssertionGenerator.Services
 
             // Create the JWT token with the specified header and payload claims.
             var token = new JwtSecurityToken(
-                new JwtHeader(signingCredentials, headers, _config.Type),
+                new JwtHeader(signingCredentials, headers, config.Type),
                 new JwtPayload(payloadClaims)
             );
 
@@ -105,12 +121,23 @@ namespace PDNDClientAssertionGenerator.Services
         /// <returns>A task that represents the asynchronous operation, containing the response with the access token as a <see cref="PDNDTokenResponse"/>.</returns>
         public async Task<PDNDTokenResponse> RequestAccessTokenAsync(string clientAssertion)
         {
+          return await RequestAccessTokenAsync(_config.ClientId, clientAssertion);
+    }
+
+        /// <summary>
+        /// Asynchronously requests an access token by sending the client assertion to the OAuth2 server.
+        /// </summary>
+        /// <param name="clientId">The client identifier who's requesting the token.</param>
+        /// <param name="clientAssertion">The client assertion (JWT) used for the token request.</param>
+        /// <returns>A task that represents the asynchronous operation, containing the response with the access token as a <see cref="PDNDTokenResponse"/>.</returns>
+        public async Task<PDNDTokenResponse> RequestAccessTokenAsync(string clientId, string clientAssertion)
+        {
             using var httpClient = new HttpClient();
 
             // Create the payload for the POST request in URL-encoded format.
             var payload = new Dictionary<string, string>
             {
-                { OpenIdConnectParameterNames.ClientId, _config.ClientId }, // Client ID as per OAuth2 spec
+                { OpenIdConnectParameterNames.ClientId, clientId }, // Client ID as per OAuth2 spec
                 { OpenIdConnectParameterNames.ClientAssertion, clientAssertion }, // Client assertion (JWT) generated in the previous step
                 { OpenIdConnectParameterNames.ClientAssertionType, OAuth2Consts.ClientAssertionTypeJwtBearer }, // Assertion type
                 { OpenIdConnectParameterNames.GrantType, OpenIdConnectGrantTypes.ClientCredentials } // Grant type for client credentials

@@ -6,9 +6,9 @@
     <Nullable>enable</Nullable>
     <RootNamespace>$(MSBuildProjectName.Replace(" ", "_").Replace(".Abstractions", ""))</RootNamespace>
   </PropertyGroup>
-  <!--<PropertyGroup>
+  <PropertyGroup>
     <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild> --><!--Enable prior to release a new version--><!--
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild> <!--Enable prior to release a new version-->
     <RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
   </PropertyGroup>
   <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="BuildOnlySettings;ResolveReferences">
@@ -20,6 +20,6 @@
     <Exec Command="%userprofile%\.nuget\nuget.exe delete $(PackageId) $(PackageVersion) -source &quot;E:\Dati\Svil\NuGetRepo&quot; -noninteractive" ContinueOnError="true" />
     <Exec Command="rmdir /s /q %userprofile%\.nuget\packages\$(PackageId)\$(PackageVersion)" ContinueOnError="true" />
     <Exec Command="%userprofile%\.nuget\nuget.exe add &quot;bin\$(ConfigurationName)\$(PackageId).$(PackageVersion).nupkg&quot; -source &quot;E:\Dati\Svil\NuGetRepo&quot;" />
-  </Target>-->
+  </Target>
 
 </Project>
