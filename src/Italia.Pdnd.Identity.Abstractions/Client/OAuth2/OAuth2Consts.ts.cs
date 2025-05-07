@@ -1,4 +1,6 @@
-public static class OAuth2Consts
+namespace Italia.Pdnd.Identity.Client.OAuth2
+{
+  public static class OAuth2Consts
 {
   // Parameter names
   public const string PDNDValueParameterName = "value";
@@ -12,4 +14,5 @@ public static class OAuth2Consts
   public const string TokenEndpointProduction = "https://auth.interop.pagopa.it/token.oauth2";
 
   public const string ClientAssertionTypeJwtBearer = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
+}
 }
