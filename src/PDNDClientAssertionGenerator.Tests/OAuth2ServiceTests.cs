@@ -3,9 +3,9 @@
 using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Protected;
-using PDNDClientAssertionGenerator.Configuration;
 using PDNDClientAssertionGenerator.Services;
 using System.Net;
+using Italia.Pdnd.Identity.Client.AppConfig;
 
 namespace PDNDClientAssertionGenerator.Tests
 {

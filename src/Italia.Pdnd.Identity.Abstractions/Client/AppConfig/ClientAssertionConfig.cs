@@ -1,11 +1,9 @@
 ﻿// (c) 2024 Francesco Del Re <francesco.delre.87@gmail.com>
 // This code is licensed under MIT license (see LICENSE.txt for details)
 
-using Italia.Pdnd.Identity.Client.OAuth2;
-
-namespace PDNDClientAssertionGenerator.Configuration
+namespace Italia.Pdnd.Identity.Client.AppConfig
 {
-    public class ClientAssertionConfig : IClientAssertionConfig
+    public class ClientAssertionConfig
     {
         /// <summary>
         /// Gets or sets the authentication server URL

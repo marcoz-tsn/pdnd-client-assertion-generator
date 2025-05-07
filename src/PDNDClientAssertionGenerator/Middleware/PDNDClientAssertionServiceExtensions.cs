@@ -1,8 +1,10 @@
 ﻿// (c) 2024 Francesco Del Re <francesco.delre.87@gmail.com>
 // This code is licensed under MIT license (see LICENSE.txt for details)
+
+using Italia.Pdnd.Identity.Client.AppConfig;
+using Italia.Pdnd.Identity.Client.OAuth2;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using PDNDClientAssertionGenerator.Configuration;
 using PDNDClientAssertionGenerator.Interfaces;
 using PDNDClientAssertionGenerator.Services;
 
