@@ -2,6 +2,10 @@ namespace Italia.Pdnd.Identity.Client.OAuth2
 {
   public static class OAuth2Consts
 {
+  // Header names
+  public const string PDNDTrackingEvidenceHeaderName = "Agid-JWT-TrackingEvidence";
+  public const string PDNDSignatureHeaderName = "Agid-JWT-Signature";
+
   // Parameter names
   public const string PDNDValueParameterName = "value";
 
