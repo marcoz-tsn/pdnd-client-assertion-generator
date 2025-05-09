@@ -3,4 +3,5 @@
 public class PDNDVoucher : PDNDTokenResponse
 {
   public string TrackingEvidence { get; set; }
+  public string Digest { get; set; }
 }

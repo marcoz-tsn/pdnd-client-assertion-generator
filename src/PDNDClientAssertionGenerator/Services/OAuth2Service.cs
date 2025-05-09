@@ -11,6 +11,8 @@ using System.Net.Mime;
 using System.Security.Claims;
 using System.Text.Json;
 using Italia.Pdnd.Identity.Client.AppConfig;
+using Italia.Pdnd.Identity.Client.OAuth2.Pdnd;
+using JwtHeaderParameterNames = System.IdentityModel.Tokens.Jwt.JwtHeaderParameterNames;
 
 namespace PDNDClientAssertionGenerator.Services
 {
@@ -58,7 +60,7 @@ namespace PDNDClientAssertionGenerator.Services
                 new Claim(JwtRegisteredClaimNames.Iss, _config.Issuer),   // Issuer of the token
                 new Claim(JwtRegisteredClaimNames.Sub, _config.Subject),  // Subject of the token
                 new Claim(JwtRegisteredClaimNames.Aud, _config.Audience), // Audience for which the token is intended
-                new Claim(OAuth2Consts.PDNDPurposeIdClaimName, _config.PurposeId), // Custom claim for the purpose of the token
+                new Claim(JwtClaimNames.PurposeId, _config.PurposeId), // Custom claim for the purpose of the token
                 new Claim(JwtRegisteredClaimNames.Jti, tokenId), // JWT ID
                 new Claim(JwtRegisteredClaimNames.Iat, issuedAt.ToUnixTimestamp().ToString(), ClaimValueTypes.Integer64), // Issued At time (as Unix timestamp)
                 new Claim(JwtRegisteredClaimNames.Exp, expiresAt.ToUnixTimestamp().ToString(), ClaimValueTypes.Integer64)  // Expiration time (as Unix timestamp)
