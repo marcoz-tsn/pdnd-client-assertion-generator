@@ -11,10 +11,25 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>.NET Client Assertion Generator for PDND Service API</Title>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-	<Version>1.0.4</Version>
+	<Version>2.0.0</Version>
     <AssemblyVersion></AssemblyVersion>
     <Authors>Francesco Del Re</Authors>
   </PropertyGroup>
+  <PropertyGroup>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild> <!--Enable prior to release a new version-->
+    <RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
+  </PropertyGroup>
+  <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="BuildOnlySettings;ResolveReferences">
+    <ItemGroup>
+      <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))" />
+    </ItemGroup>
+  </Target>
+  <Target Name="PostPackNugetDeploy" AfterTargets="Pack">
+    <Exec Command="%userprofile%\.nuget\nuget.exe delete $(PackageId) $(PackageVersion) -source &quot;E:\Dati\Svil\NuGetRepo&quot; -noninteractive" ContinueOnError="true" />
+    <Exec Command="rmdir /s /q %userprofile%\.nuget\packages\$(PackageId)\$(PackageVersion)" ContinueOnError="true" />
+    <Exec Command="%userprofile%\.nuget\nuget.exe add &quot;bin\$(ConfigurationName)\$(PackageId).$(PackageVersion).nupkg&quot; -source &quot;E:\Dati\Svil\NuGetRepo&quot;" />
+  </Target>
 
   <ItemGroup>
     <None Include="..\..\LICENSE">
