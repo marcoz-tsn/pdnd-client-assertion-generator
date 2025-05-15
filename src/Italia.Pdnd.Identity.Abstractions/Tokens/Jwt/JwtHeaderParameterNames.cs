@@ -1,4 +1,4 @@
-﻿namespace Italia.Pdnd.Identity.Client.OAuth2.Pdnd;
+﻿namespace Italia.Pdnd.IdentityModel.Client.OAuth2.Pdnd;
 
 public struct JwtHeaderParameterNames
 {

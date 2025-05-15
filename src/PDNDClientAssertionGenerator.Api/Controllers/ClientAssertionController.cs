@@ -1,11 +1,11 @@
 // (c) 2024 Francesco Del Re <francesco.delre.87@gmail.com>
 // This code is licensed under MIT license (see LICENSE.txt for details)
 
-using Italia.Pdnd.Identity.Client.OAuth2;
+using Italia.Pdnd.IdentityModel.Client.OAuth2;
+using Italia.Pdnd.IdentityModel.ClientAssertionGenerator.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using PDNDClientAssertionGenerator.Interfaces;
 
-namespace PDNDClientAssertionGenerator.Api.Controllers
+namespace Italia.Pdnd.IdentityModel.ClientAssertionGenerator.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]

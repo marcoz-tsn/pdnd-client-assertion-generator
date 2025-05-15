@@ -1,7 +1,7 @@
 ﻿// (c) 2024 Francesco Del Re <francesco.delre.87@gmail.com>
 // This code is licensed under MIT license (see LICENSE.txt for details)
 
-namespace Italia.Pdnd.Identity.Client.OAuth2
+namespace Italia.Pdnd.IdentityModel.Client.OAuth2
 {
     public interface IOAuth2Service
     {

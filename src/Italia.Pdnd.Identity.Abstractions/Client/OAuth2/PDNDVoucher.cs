@@ -1,4 +1,4 @@
-﻿namespace Italia.Pdnd.Identity.Client.OAuth2;
+﻿namespace Italia.Pdnd.IdentityModel.Client.OAuth2;
 
 public class PDNDVoucher : PDNDTokenResponse
 {

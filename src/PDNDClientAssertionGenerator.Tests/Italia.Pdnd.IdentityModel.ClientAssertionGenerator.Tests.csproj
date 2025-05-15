@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PDNDClientAssertionGenerator\PDNDClientAssertionGenerator.csproj" />
+    <ProjectReference Include="..\PDNDClientAssertionGenerator\Italia.Pdnd.IdentityModel.ClientAssertionGenerator.csproj" />
   </ItemGroup>
 
   <ItemGroup>

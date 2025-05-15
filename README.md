@@ -1,8 +1,8 @@
 # PDND Client Assertion Generator
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Nuget](https://img.shields.io/nuget/v/PDNDClientAssertionGenerator?style=plastic)](https://www.nuget.org/packages/PDNDClientAssertionGenerator)
-![NuGet Downloads](https://img.shields.io/nuget/dt/PDNDClientAssertionGenerator)
+[![Nuget](https://img.shields.io/nuget/v/Italia.Pdnd.IdentityModel.ClientAssertionGenerator?style=plastic)](https://www.nuget.org/packages/Italia.Pdnd.IdentityModel.ClientAssertionGenerator)
+![NuGet Downloads](https://img.shields.io/nuget/dt/Italia.Pdnd.IdentityModel.ClientAssertionGenerator)
 [![Build](https://github.com/italia/pdnd-client-assertion-generator/actions/workflows/dotnet.yml/badge.svg)](https://github.com/italia/pdnd-client-assertion-generator/actions/workflows/dotnet.yml)
 [![issues - pdnd-client-assertion-generator](https://img.shields.io/github/issues/italia/pdnd-client-assertion-generator)](https://github.com/italia/pdnd-client-assertion-generator/issues)
 [![Language - C#](https://img.shields.io/static/v1?label=Language&message=C%23&color=blueviolet)](https://dotnet.microsoft.com/it-it/languages/csharp)
@@ -59,17 +59,17 @@ Then you can use `ClientAssertionGeneratorService`, which provides the following
 - `GetClientAssertionAsync`
 - `GetTokenAsync(clientAssertion)`
 
-## Testing the PDNDClientAssertionGenerator
-This project includes a test application, **PDNDClientAssertionGenerator.Api**, designed to help you test the software with your own configuration. This application acts as a sandbox where you can validate the behavior of the PDNDClientAssertionGenerator components.
+## Testing the Italia.Pdnd.IdentityModel.ClientAssertionGenerator
+This project includes a test application, **Italia.Pdnd.IdentityModel.ClientAssertionGenerator.Api**, designed to help you test the software with your own configuration. This application acts as a sandbox where you can validate the behavior of the Italia.Pdnd.IdentityModel.ClientAssertionGenerator components.
 
 ### How to Use the Test Application:
 
 1. Configuration: Update the configuration settings in the `appsettings.json` file or through environment variables to match your specific use case and environment.
 
 2. Running the Test Application:
-    - Navigate to the PDNDClientAssertionGenerator.Api folder.
+    - Navigate to the Italia.Pdnd.IdentityModel.ClientAssertionGenerator.Api folder.
     - Use the following command to run the application:  
-      `dotnet run --project src/PDNDClientAssertionGenerator.Api/PDNDClientAssertionGenerator.Api.csproj`
+      `dotnet run --project src/Italia.Pdnd.IdentityModel.ClientAssertionGenerator.Api/Italia.Pdnd.IdentityModel.ClientAssertionGenerator.Api.csproj`
   
 3. Testing Scenarios: Once the application is running, you can use various `GetClientAssertion` and `GetToken` to test the functionality of the software in different configurations.
 
