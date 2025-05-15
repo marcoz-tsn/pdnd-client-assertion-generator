@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Italia.Pdnd.IdentityModel.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Italia.Pdnd.IdentityModel.ClientAssertionGenerator.Api", "..\PDNDClientAssertionGenerator.Api\Italia.Pdnd.IdentityModel.ClientAssertionGenerator.Api.csproj", "{26CA7E5F-DE21-4155-882A-CF248007B48A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Italia.Pdnd.IdentityModel.Abstractions", "..\Italia.Pdnd.Identity.Abstractions\Italia.Pdnd.IdentityModel.Abstractions.csproj", "{AA594A29-2AEC-41E4-BF47-050C04319D9E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Italia.Pdnd.IdentityModel.Abstractions", "..\Italia.Pdnd.IdentityModel.Abstractions\Italia.Pdnd.IdentityModel.Abstractions.csproj", "{AA594A29-2AEC-41E4-BF47-050C04319D9E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
