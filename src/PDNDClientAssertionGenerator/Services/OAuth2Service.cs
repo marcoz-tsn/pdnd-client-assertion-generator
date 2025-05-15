@@ -1,25 +1,25 @@
 ﻿// (c) 2024 Francesco Del Re <francesco.delre.87@gmail.com>
 // This code is licensed under MIT license (see LICENSE.txt for details)
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Italia.Pdnd.Identity.Client.AppConfig;
 using Italia.Pdnd.Identity.Client.OAuth2;
+using Italia.Pdnd.Identity.Client.OAuth2.Pdnd;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
 using PDNDClientAssertionGenerator.Utils;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Security.Claims;
 using System.Text.Json;
-using Italia.Pdnd.Identity.Client.AppConfig;
-using Italia.Pdnd.Identity.Client.OAuth2.Pdnd;
 using JwtHeaderParameterNames = System.IdentityModel.Tokens.Jwt.JwtHeaderParameterNames;
 
 namespace PDNDClientAssertionGenerator.Services
 {
-    /// <summary>
-    /// Service for handling OAuth2 client assertion generation and token requests.
-    /// </summary>
-    public class OAuth2Service : IOAuth2Service
+  /// <summary>
+  /// Service for handling OAuth2 client assertion generation and token requests.
+  /// </summary>
+  public class OAuth2Service : IOAuth2Service
     {
         private readonly ClientAssertionConfig _config;
 
@@ -99,6 +99,26 @@ namespace PDNDClientAssertionGenerator.Services
             return await Task.FromResult(clientAssertion); // Return the generated token as a string.
         }
 
+        public PDNDTokenRequest GetAccessTokenRequestContent(string clientAssertion)
+        {
+            var tokenRequest = new PDNDTokenRequest
+            {
+              // Create the payload for the POST request in URL-encoded format.
+              NameValueCollection = new Dictionary<string, string>
+              {
+                  { OpenIdConnectParameterNames.ClientId, _config.ClientId }, // Client ID as per OAuth2 spec
+                  { OpenIdConnectParameterNames.ClientAssertion, clientAssertion }, // Client assertion (JWT) generated in the previous step
+                  { OpenIdConnectParameterNames.ClientAssertionType, OAuth2Consts.ClientAssertionTypeJwtBearer }, // Assertion type
+                  { OpenIdConnectParameterNames.GrantType, OpenIdConnectGrantTypes.ClientCredentials } // Grant type for client credentials
+              }
+            };
+
+            // Create the content for the POST request (FormUrlEncodedContent).
+            tokenRequest.Content = new FormUrlEncodedContent(tokenRequest.NameValueCollection);
+
+            return tokenRequest;
+        }
+
         /// <summary>
         /// Asynchronously requests an access token by sending the client assertion to the OAuth2 server.
         /// </summary>
@@ -106,25 +126,27 @@ namespace PDNDClientAssertionGenerator.Services
         /// <returns>A task that represents the asynchronous operation, containing the response with the access token as a <see cref="PDNDTokenResponse"/>.</returns>
         public async Task<PDNDTokenResponse> RequestAccessTokenAsync(string clientAssertion)
         {
-            using var httpClient = new HttpClient();
+          // Get the content for the POST request
+          var tokenRequest = GetAccessTokenRequestContent(clientAssertion);
+          
+          // Call overload method with the content
+          return await RequestAccessTokenAsync(tokenRequest!);
+        }
 
-            // Create the payload for the POST request in URL-encoded format.
-            var payload = new Dictionary<string, string>
-            {
-                { OpenIdConnectParameterNames.ClientId, _config.ClientId }, // Client ID as per OAuth2 spec
-                { OpenIdConnectParameterNames.ClientAssertion, clientAssertion }, // Client assertion (JWT) generated in the previous step
-                { OpenIdConnectParameterNames.ClientAssertionType, OAuth2Consts.ClientAssertionTypeJwtBearer }, // Assertion type
-                { OpenIdConnectParameterNames.GrantType, OpenIdConnectGrantTypes.ClientCredentials } // Grant type for client credentials
-            };
+        /// <summary>
+        /// Asynchronously requests an access token by sending the client assertion to the OAuth2 server.
+        /// </summary>
+        /// <param name="tokenRequest">The HTTP content (FormUrlEncodedContent) used for the token request.</param>
+        /// <returns>A task that represents the asynchronous operation, containing the response with the access token as a <see cref="PDNDTokenResponse"/>.</returns>
+        public async Task<PDNDTokenResponse> RequestAccessTokenAsync(PDNDTokenRequest tokenRequest)
+        {
+            using var httpClient = new HttpClient();
 
             // Set the Accept header to request JSON responses from the server.
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaTypeNames.Application.Json));
 
-            // Create the content for the POST request (FormUrlEncodedContent).
-            var content = new FormUrlEncodedContent(payload);
-
             // Send the POST request to the OAuth2 server and await the response.
-            var response = await httpClient.PostAsync(_config.ServerUrl, content);
+            var response = await httpClient.PostAsync(_config.ServerUrl, tokenRequest.Content);
 
             // Ensure the response indicates success (throws an exception if not).
             response.EnsureSuccessStatusCode();

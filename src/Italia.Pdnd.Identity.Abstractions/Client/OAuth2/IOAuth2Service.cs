@@ -7,5 +7,7 @@ namespace Italia.Pdnd.Identity.Client.OAuth2
     {
         Task<string> GenerateClientAssertionAsync();
         Task<PDNDTokenResponse> RequestAccessTokenAsync(string clientAssertion);
+        PDNDTokenRequest GetAccessTokenRequestContent(string clientAssertion);
+        Task<PDNDTokenResponse> RequestAccessTokenAsync(PDNDTokenRequest tokenRequest);
     }
 }
