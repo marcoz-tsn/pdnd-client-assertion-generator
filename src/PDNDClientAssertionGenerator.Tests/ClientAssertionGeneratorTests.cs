@@ -1,11 +1,11 @@
 // (c) 2024 Francesco Del Re <francesco.delre.87@gmail.com>
 // This code is licensed under MIT license (see LICENSE.txt for details)
 
-using Italia.Pdnd.Identity.Client.OAuth2;
+using Italia.Pdnd.IdentityModel.Client.OAuth2;
+using Italia.Pdnd.IdentityModel.ClientAssertionGenerator.Services;
 using Moq;
-using PDNDClientAssertionGenerator.Services;
 
-namespace PDNDClientAssertionGenerator.Tests
+namespace Italia.Pdnd.IdentityModel.ClientAssertionGenerator.Tests
 {
     public class ClientAssertionGeneratorServiceTests
     {

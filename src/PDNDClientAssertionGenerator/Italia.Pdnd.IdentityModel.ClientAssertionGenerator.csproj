@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Italia.Pdnd.Identity.Abstractions" Version="0.1.0" />
+    <PackageReference Include="Italia.Pdnd.IdentityModel.Abstractions" Version="0.2.0" />
 
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />

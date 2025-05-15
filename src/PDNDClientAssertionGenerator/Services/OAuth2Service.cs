@@ -1,20 +1,21 @@
 ﻿// (c) 2024 Francesco Del Re <francesco.delre.87@gmail.com>
 // This code is licensed under MIT license (see LICENSE.txt for details)
-using Italia.Pdnd.Identity.Client.AppConfig;
-using Italia.Pdnd.Identity.Client.OAuth2;
-using Italia.Pdnd.Identity.Client.OAuth2.Pdnd;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Microsoft.IdentityModel.Tokens;
-using PDNDClientAssertionGenerator.Utils;
+
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Security.Claims;
 using System.Text.Json;
+using Italia.Pdnd.IdentityModel.Client.AppConfig;
+using Italia.Pdnd.IdentityModel.Client.OAuth2;
+using Italia.Pdnd.IdentityModel.Client.OAuth2.Pdnd;
+using Italia.Pdnd.IdentityModel.ClientAssertionGenerator.Utils;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
 using JwtHeaderParameterNames = System.IdentityModel.Tokens.Jwt.JwtHeaderParameterNames;
 
-namespace PDNDClientAssertionGenerator.Services
+namespace Italia.Pdnd.IdentityModel.ClientAssertionGenerator.Services
 {
   /// <summary>
   /// Service for handling OAuth2 client assertion generation and token requests.

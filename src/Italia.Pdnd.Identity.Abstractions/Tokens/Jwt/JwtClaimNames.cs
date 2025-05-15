@@ -1,6 +1,6 @@
 ﻿// ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo
-namespace Italia.Pdnd.Identity.Client.OAuth2.Pdnd;
+namespace Italia.Pdnd.IdentityModel.Client.OAuth2.Pdnd;
 
 public struct JwtClaimNames
 {

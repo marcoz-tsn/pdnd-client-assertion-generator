@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35201.131
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PDNDClientAssertionGenerator", "PDNDClientAssertionGenerator.csproj", "{5C5D5A27-89FC-4115-908B-8F14355C0143}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Italia.Pdnd.IdentityModel.ClientAssertionGenerator", "Italia.Pdnd.IdentityModel.ClientAssertionGenerator.csproj", "{5C5D5A27-89FC-4115-908B-8F14355C0143}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{EC21B885-CE5E-427F-9D06-CAED570F2184}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PDNDClientAssertionGenerator.Tests", "..\PDNDClientAssertionGenerator.Tests\PDNDClientAssertionGenerator.Tests.csproj", "{7A2109DE-C26B-4B1C-BD3E-2E2E451DC067}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Italia.Pdnd.IdentityModel.ClientAssertionGenerator.Tests", "..\PDNDClientAssertionGenerator.Tests\Italia.Pdnd.IdentityModel.ClientAssertionGenerator.Tests.csproj", "{7A2109DE-C26B-4B1C-BD3E-2E2E451DC067}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PDNDClientAssertionGenerator.Api", "..\PDNDClientAssertionGenerator.Api\PDNDClientAssertionGenerator.Api.csproj", "{26CA7E5F-DE21-4155-882A-CF248007B48A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Italia.Pdnd.IdentityModel.ClientAssertionGenerator.Api", "..\PDNDClientAssertionGenerator.Api\Italia.Pdnd.IdentityModel.ClientAssertionGenerator.Api.csproj", "{26CA7E5F-DE21-4155-882A-CF248007B48A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Italia.Pdnd.Identity.Abstractions", "..\Italia.Pdnd.Identity.Abstractions\Italia.Pdnd.Identity.Abstractions.csproj", "{AA594A29-2AEC-41E4-BF47-050C04319D9E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Italia.Pdnd.IdentityModel.Abstractions", "..\Italia.Pdnd.Identity.Abstractions\Italia.Pdnd.IdentityModel.Abstractions.csproj", "{AA594A29-2AEC-41E4-BF47-050C04319D9E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

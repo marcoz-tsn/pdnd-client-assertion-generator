@@ -1,4 +1,4 @@
-﻿namespace Italia.Pdnd.Identity.Net.Http.Headers.Pdnd;
+﻿namespace Italia.Pdnd.IdentityModel.Net.Http.Headers;
 
 public static class HeaderNames
 {
