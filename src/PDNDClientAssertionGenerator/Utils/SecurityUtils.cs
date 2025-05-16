@@ -105,5 +105,23 @@ namespace Italia.Pdnd.IdentityModel.ClientAssertionGenerator.Utils
                 throw new InvalidOperationException("Failed to retrieve or import RSA security parameters.", ex);
             }
         }
+
+        public static RSA GetRsaFromKeyPem(string keyPem)
+        {
+            try
+            {
+                // Create a new instance of RSA and import the retrieved key parameters.
+                var rsa = RSA.Create();
+                rsa.ImportFromPem(keyPem);
+
+                // Return the configured RSA instance.
+                return rsa;
+            }
+            catch (Exception ex)
+            {
+                // If there is an error during the retrieval or import of the key, throw an InvalidOperationException.
+                throw new InvalidOperationException("Failed to retrieve or import RSA security parameters.", ex);
+            }
+        }
     }
 }
