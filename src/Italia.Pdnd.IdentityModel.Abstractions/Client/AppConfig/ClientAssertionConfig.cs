@@ -56,13 +56,23 @@ namespace Italia.Pdnd.IdentityModel.Client.AppConfig
         public string PurposeId { get; set; }
 
         /// <summary>
-        /// Gets or sets the path to the private key to sign the client assertion
+        /// Gets or sets the purpose for which access to resources will be requested (purposeId)
         /// </summary>
-        public string KeyPath { get; set; }
+        public string EService { get; set; }
 
         /// <summary>
         /// Gets or sets the duration in minutes of the token (this will be used to calculate the token expiration)
         /// </summary>
         public int Duration { get; set; }
+
+        /// <summary>
+        /// Gets or sets the path to the private key to sign the client assertion
+        /// </summary>
+        public string? KeyPath { get; set; }
+
+        /// <summary>
+        /// Gets or sets the private key PEM to sign the client assertion
+        /// </summary>
+        public string? KeyPem { get; set; }
     }
 }
