@@ -40,7 +40,38 @@ namespace Italia.Pdnd.IdentityModel.ClientAssertionGenerator.Services
         /// Asynchronously generates a client assertion (JWT) token.
         /// </summary>
         /// <returns>A task that represents the asynchronous operation, containing the generated client assertion as a string.</returns>
-        public async Task<string> GenerateClientAssertionAsync(Dictionary<string, string> complementaryInfo)
+        public async Task<string> GenerateClientAssertionAsync()
+        {
+          return (await GenerateClientAssertionAsync([])).ClientAssertion;
+        }
+
+        /// <summary>
+        /// Asynchronously requests an access token by sending the client assertion to the OAuth2 server.
+        /// </summary>
+        /// <param name="clientAssertion">The client assertion (JWT) used for the token request.</param>
+        /// <returns>A task that represents the asynchronous operation, containing the response with the access token as a <see cref="PDNDTokenResponse"/>.</returns>
+        public async Task<PDNDTokenResponse> RequestAccessTokenAsync(string clientAssertion)
+        {
+          // Get the content for the POST request
+          var tokenRequestInfo = GetAccessTokenRequest(new PDNDVoucherMetadata
+          {
+            ClientAssertion = clientAssertion
+          });
+          
+          // Call overload method with the content
+          return (await RequestAccessTokenAsync(tokenRequestInfo)).TokenResponse
+                 ?? new PDNDTokenResponse
+                 {
+                   TokenType = string.Empty, AccessToken = string.Empty
+                 };
+        }
+
+
+        /// <summary>
+        /// Asynchronously generates a client assertion (JWT) token.
+        /// </summary>
+        /// <returns>A task that represents the asynchronous operation, containing the generated client assertion as a string.</returns>
+        public async Task<PDNDVoucherMetadata> GenerateClientAssertionAsync(Dictionary<string, string> complementaryInfo)
         {
             // Create signing credentials using RSA for signing the token.
             SigningCredentials signingCredentials;
@@ -119,58 +150,40 @@ namespace Italia.Pdnd.IdentityModel.ClientAssertionGenerator.Services
                 throw new InvalidOperationException("Failed to generate JWT token.", ex);
             }
 
-            return clientAssertion; // Return the generated token as a string.
+            //return clientAssertion; // Return the generated token as a string.
+            return new PDNDVoucherMetadata
+            {
+              ClientAssertion = clientAssertion,
+              TrackingEvidence = trackingEvidence,
+            };
         }
 
-        /// <summary>
-        /// Asynchronously generates a client assertion (JWT) token.
-        /// </summary>
-        /// <returns>A task that represents the asynchronous operation, containing the generated client assertion as a string.</returns>
-        public async Task<string> GenerateClientAssertionAsync()
+        public PDNDAccessTokenRequest GetAccessTokenRequest(PDNDVoucherMetadata voucherMetadata)
         {
-          return await GenerateClientAssertionAsync([]);
-        }
-
-        public PDNDTokenRequest GetAccessTokenRequestContent(string clientAssertion)
-        {
-            var tokenRequest = new PDNDTokenRequest
+            var accessTokenRequest = new PDNDAccessTokenRequest
             {
               // Create the payload for the POST request in URL-encoded format.
               NameValueCollection = new Dictionary<string, string>
               {
                   { OpenIdConnectParameterNames.ClientId, _config.ClientId }, // Client ID as per OAuth2 spec
-                  { OpenIdConnectParameterNames.ClientAssertion, clientAssertion }, // Client assertion (JWT) generated in the previous step
+                  { OpenIdConnectParameterNames.ClientAssertion, voucherMetadata.ClientAssertion }, // Client assertion (JWT) generated in the previous step
                   { OpenIdConnectParameterNames.ClientAssertionType, OAuth2Consts.ClientAssertionTypeJwtBearer }, // Assertion type
                   { OpenIdConnectParameterNames.GrantType, OpenIdConnectGrantTypes.ClientCredentials } // Grant type for client credentials
               }
             };
 
             // Create the content for the POST request (FormUrlEncodedContent).
-            tokenRequest.Content = new FormUrlEncodedContent(tokenRequest.NameValueCollection);
+            accessTokenRequest.Content = new FormUrlEncodedContent(accessTokenRequest.NameValueCollection);
 
-            return tokenRequest;
+            return accessTokenRequest;
         }
 
         /// <summary>
         /// Asynchronously requests an access token by sending the client assertion to the OAuth2 server.
         /// </summary>
-        /// <param name="clientAssertion">The client assertion (JWT) used for the token request.</param>
-        /// <returns>A task that represents the asynchronous operation, containing the response with the access token as a <see cref="PDNDTokenResponse"/>.</returns>
-        public async Task<PDNDTokenResponse> RequestAccessTokenAsync(string clientAssertion)
-        {
-          // Get the content for the POST request
-          var tokenRequest = GetAccessTokenRequestContent(clientAssertion);
-          
-          // Call overload method with the content
-          return await RequestAccessTokenAsync(tokenRequest!);
-        }
-
-        /// <summary>
-        /// Asynchronously requests an access token by sending the client assertion to the OAuth2 server.
-        /// </summary>
-        /// <param name="tokenRequest">The HTTP content (FormUrlEncodedContent) used for the token request.</param>
-        /// <returns>A task that represents the asynchronous operation, containing the response with the access token as a <see cref="PDNDTokenResponse"/>.</returns>
-        public async Task<PDNDTokenResponse> RequestAccessTokenAsync(PDNDTokenRequest tokenRequest)
+        /// <param name="accessTokenRequest">The HTTP content (FormUrlEncodedContent) used for the token request.</param>
+        /// <returns>A task that represents the asynchronous operation, containing the response with the access token as a <see cref="PDNDVoucher"/>.</returns>
+        public async Task<PDNDVoucher> RequestAccessTokenAsync(PDNDAccessTokenRequest accessTokenRequest)
         {
             using var httpClient = new HttpClient();
 
@@ -178,7 +191,7 @@ namespace Italia.Pdnd.IdentityModel.ClientAssertionGenerator.Services
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaTypeNames.Application.Json));
 
             // Send the POST request to the OAuth2 server and await the response.
-            var response = await httpClient.PostAsync(_config.ServerUrl, tokenRequest.Content);
+            var response = await httpClient.PostAsync(_config.ServerUrl, accessTokenRequest.Content);
 
             // Ensure the response indicates success (throws an exception if not).
             response.EnsureSuccessStatusCode();
@@ -189,11 +202,16 @@ namespace Italia.Pdnd.IdentityModel.ClientAssertionGenerator.Services
             try
             {
                 // Deserialize the JSON response into the PDNDTokenResponse object.
-                return JsonSerializer.Deserialize<PDNDTokenResponse>(jsonResponse) ?? new PDNDTokenResponse
-                {
-                  TokenType = string.Empty
-                  , AccessToken = string.Empty
-                };
+                //return JsonSerializer.Deserialize<PDNDTokenResponse>(jsonResponse) ?? new PDNDTokenResponse
+                //{
+                //  TokenType = string.Empty
+                //    , AccessToken = string.Empty
+                //};
+                var voucher =  JsonSerializer.Deserialize<PDNDVoucher>(jsonResponse)
+                              ?? new PDNDVoucher();
+
+                voucher.VoucherMetadata = accessTokenRequest.VoucherMetadata;
+                return voucher;
             }
             catch (JsonException ex)
             {
@@ -201,6 +219,7 @@ namespace Italia.Pdnd.IdentityModel.ClientAssertionGenerator.Services
                 throw new InvalidOperationException("Failed to deserialize the token response.", ex);
             }
         }
+
 
         private JwtHeader CreateJwtHeader(SigningCredentials signingCredentials, string securityAlgorithm, string tokenType = JwtConstants.HeaderType)
         {

@@ -11,7 +11,7 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>.NET Client Assertion Generator for PDND Service API</Title>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-	<Version>2.0.1</Version>
+	<Version>2.0.2</Version>
     <AssemblyVersion></AssemblyVersion>
     <Authors>Francesco Del Re</Authors>
   </PropertyGroup>
@@ -43,7 +43,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Italia.Pdnd.IdentityModel.Abstractions" Version="0.2.1" />
+    <PackageReference Include="Italia.Pdnd.IdentityModel.Abstractions" Version="0.2.2" />
 
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
