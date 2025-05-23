@@ -73,25 +73,9 @@ namespace Italia.Pdnd.IdentityModel.ClientAssertionGenerator.Services
         /// <returns>A task that represents the asynchronous operation, containing the generated client assertion as a string.</returns>
         public async Task<PDNDVoucherMetadata> GenerateClientAssertionAsync(Dictionary<string, string> complementaryInfo)
         {
-            // Create signing credentials using RSA for signing the token.
-            SigningCredentials signingCredentials;
-            using (var rsa = _config.KeyPath != null ?
-                     SecurityUtils.GetRsaFromKeyPath(_config.KeyPath) : _config.KeyPem != null ?
-                     SecurityUtils.GetRsaFromKeyPem(_config.KeyPem)
-                      : throw new InvalidOperationException("No signature key configuration was provided.")
-                  )
-            {
-              var rsaSecurityKey = new RsaSecurityKey(rsa)
-              {
-                KeyId = _config.KeyId
-              };
-              signingCredentials = GetSigningCredentials(rsaSecurityKey, _config.Algorithm); //_config.Algorithm -> SecurityAlgorithms.RsaSha256
-            }
-
             // Define the current UTC time and the token expiration time.
             var issuedAt = DateTime.UtcNow;
             var expiresAt = issuedAt.AddMinutes(_config.Duration);
-
             // Generate a unique token ID (JWS ID)
             var trackingTokenId = Guid.NewGuid().ToString("D").ToLower();
             // Generate a random nonce for augmented entropy
@@ -106,14 +90,13 @@ namespace Italia.Pdnd.IdentityModel.ClientAssertionGenerator.Services
               new Claim(JwtRegisteredClaimNames.Jti, trackingTokenId), // JWS ID
               new Claim(PdndClaimNames.Dnonce, dNonce, ClaimValueTypes.Integer64),
             ]);
-            var trackingEvidence = await GenerateTrackingEvidenceAsync(claims, complementaryInfo, signingCredentials);
+            var trackingEvidence = await GenerateTrackingEvidenceAsync(claims, complementaryInfo);
 
             // Compose the tracking digest to add to the payload
             var trackingDigest = ComposeTrackingDigest(trackingEvidence);
 
             // Generate a unique token ID (JWT ID)
             var tokenId = Guid.NewGuid().ToString("D").ToLower();
-
             // Define the payload as a list of claims, which represent the content of the JWT.
             var payloadClaims = new List<Claim>
             {
@@ -126,34 +109,38 @@ namespace Italia.Pdnd.IdentityModel.ClientAssertionGenerator.Services
                 new Claim(JwtRegisteredClaimNames.Exp, expiresAt.ToUnixTimestamp().ToString(), ClaimValueTypes.Integer64)  // Expiration time (as Unix timestamp)
             };
 
-            // Define JWT header
-            var header = CreateJwtHeader(signingCredentials, _config.Algorithm, _config.Type); //_config.Type -> JwtConstants.HeaderType
-            
-            // Create the JWT token with the specified header and payload claims.
-            var token = new JwtSecurityToken(
-                header,
-                new JwtPayload(payloadClaims)
+            string clientAssertionString; // Audit JWT
+            using (var rsa = DisposableRsa())
             {
-              { PdndClaimNames.Digest, trackingDigest } // Add the tracking digest claim to payload
-            });
+              var rsaSecurityKey = new RsaSecurityKey(rsa) { KeyId = _config.KeyId };
+              var signingCredentials = GetSigningCredentials(rsaSecurityKey, _config.Algorithm);
+              
+              // Build and serialize the Audit JWT
+              var header = CreateJwtHeader(signingCredentials, _config.Algorithm, _config.Type); //_config.Type -> JwtConstants.HeaderType
+              
+              // Create the JWT token with the specified header and payload claims.
+              var auditToken = new JwtSecurityToken(header,
+                  new JwtPayload(payloadClaims)
+              {
+                { PdndClaimNames.Digest, trackingDigest } // Add the tracking digest claim to payload
+              });
 
-            // Use JwtSecurityTokenHandler to convert the token into a string.
-            var tokenHandler = new JwtSecurityTokenHandler();
-            string clientAssertion;
-
-            try
-            {
-                clientAssertion = tokenHandler.WriteToken(token);
+              // Use JwtSecurityTokenHandler to convert the token into a string.
+              var tokenHandler = new JwtSecurityTokenHandler();
+              try
+              {
+                  clientAssertionString = tokenHandler.WriteToken(auditToken);
+              }
+              catch (Exception ex)
+              {
+                  throw new InvalidOperationException("Failed to generate JWT token.", ex);
+              }
             }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException("Failed to generate JWT token.", ex);
-            }
 
-            //return clientAssertion; // Return the generated token as a string.
+            //return clientAssertionString; // Return the generated token as a string.
             return new PDNDVoucherMetadata
             {
-              ClientAssertion = clientAssertion,
+              ClientAssertion = clientAssertionString,
               TrackingEvidence = trackingEvidence,
             };
         }
@@ -198,6 +185,7 @@ namespace Italia.Pdnd.IdentityModel.ClientAssertionGenerator.Services
 
             // Read and parse the response body as a JSON string.
             var jsonResponse = await response.Content.ReadAsStringAsync();
+            var jsonDocument = JsonDocument.Parse(jsonResponse);
 
             try
             {
@@ -207,10 +195,16 @@ namespace Italia.Pdnd.IdentityModel.ClientAssertionGenerator.Services
                 //  TokenType = string.Empty
                 //    , AccessToken = string.Empty
                 //};
-                var voucher =  JsonSerializer.Deserialize<PDNDVoucher>(jsonResponse)
-                              ?? new PDNDVoucher();
-
-                voucher.VoucherMetadata = accessTokenRequest.VoucherMetadata;
+                var voucher = new PDNDVoucher
+                  {
+                    TokenResponse = jsonDocument.Deserialize<PDNDTokenResponse>() ?? new PDNDTokenResponse
+                    {
+                      TokenType = string.Empty
+                        ,
+                      AccessToken = string.Empty
+                    },
+                    VoucherMetadata = accessTokenRequest.VoucherMetadata,
+                  };
                 return voucher;
             }
             catch (JsonException ex)
@@ -244,29 +238,41 @@ namespace Italia.Pdnd.IdentityModel.ClientAssertionGenerator.Services
         /// Asynchronously generates a tacking evidence (JWS) token.
         /// </summary>
         /// <returns>A task that represents the asynchronous operation, containing the generated tacking evidence as a string.</returns>
-        private Task<string> GenerateTrackingEvidenceAsync(List<Claim> claims, Dictionary<string, string> complementaryInfo, SigningCredentials signingCredentials)
+        private Task<string> GenerateTrackingEvidenceAsync(List<Claim> claims, Dictionary<string, string> complementaryInfo)
         {
           var trackingPayload = new JwtPayload(claims);
           trackingPayload.AddClaims(complementaryInfo.Select(x => new Claim(x.Key, x.Value)));
 
-          // Build and serialize the Tracking JWS.
-          var header = CreateJwtHeader(signingCredentials, _config.Algorithm, _config.Type);
-          var trackingToken = new JwtSecurityToken(header, trackingPayload);
-
-          // Use JwtSecurityTokenHandler to convert the token into a string.
-          var tokenHandler = new JwtSecurityTokenHandler();
-          string trackingTokenString;
-
-          try
+          string trackingEvidence;
+          using (var rsa = DisposableRsa())
           {
-            trackingTokenString = tokenHandler.WriteToken(trackingToken);
-          }
-          catch (Exception ex)
-          {
-            throw new InvalidOperationException("Failed to generate JWS token.", ex);
+            var rsaSecurityKey = new RsaSecurityKey(rsa) { KeyId = _config.KeyId };
+            var signingCredentials = GetSigningCredentials(rsaSecurityKey, _config.Algorithm);
+
+            // Build and serialize the Tracking JWS.
+            var header = CreateJwtHeader(signingCredentials, _config.Algorithm, _config.Type);
+            var trackingToken = new JwtSecurityToken(header, trackingPayload);
+
+            // Use JwtSecurityTokenHandler to convert the token into a string.
+            var tokenHandler = new JwtSecurityTokenHandler();
+            try
+            {
+              trackingEvidence = tokenHandler.WriteToken(trackingToken);
+            }
+            catch (Exception ex)
+            {
+              throw new InvalidOperationException("Failed to generate JWS token.", ex);
+            }
           }
 
-          return Task.FromResult(trackingTokenString); // Return the generated token as a string.
+          return Task.FromResult(trackingEvidence);
+        }
+
+        private RSA DisposableRsa()
+        {
+          return _config.KeyPath != null ? SecurityUtils.GetRsaFromKeyPath(_config.KeyPath)
+            : _config.KeyPem != null ? SecurityUtils.GetRsaFromKeyPem(_config.KeyPem)
+            : throw new InvalidOperationException("No signature key configuration was provided.");
         }
 
         private Dictionary<string, string> ComposeTrackingDigest(string trackingTokenString)
